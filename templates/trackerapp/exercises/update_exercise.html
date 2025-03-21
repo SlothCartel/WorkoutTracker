@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}Update Exercise{% endblock %}
+
+{% block content %}
+    <h2>Update Exercise</h2>
+    
+    <form method="post">
+        {% csrf_token %}
+
+        <label for="name">Exercise Name:</label><br>
+        <input type="text" id="name" name="name" value="{{ exercise.name }}" required><br><br>
+
+        <label for="category">Category:</label><br>
+        <select id="category" name="category" required>
+            <option value="WEIGHT" {% if exercise.category == 'WEIGHT' %}selected{% endif %}>Weight Training</option>
+            <option value="CARDIO" {% if exercise.category == 'CARDIO' %}selected{% endif %}>Cardio</option>
+        </select><br><br>
+
+        <button type="submit" class="btn update">Save Changes</button>
+        <a href="{% url 'exercises' %}" class="btn delete">Cancel</a>
+    </form>
+{% endblock %}

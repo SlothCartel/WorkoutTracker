@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Weight Tracker{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'global.css' %}">
+</head>
+<body>
+    <header>
+        <h1>Workout Tracker</h1>
+        <nav>
+            <a href="/">Home</a>
+            <a href="/workouts/">Workouts</a>
+            <a href="/exercises/">Exercises</a>
+        </nav>
+    </header>
+
+    <main>
+        {% block content %}
+        <!-- Page-specific content will go here -->
+        {% endblock %}
+    </main>
+
+    <footer>
+        <p>&copy; {{ now|date:"Y" }} My Tracker</p>
+    </footer>
+</body>
+</html>

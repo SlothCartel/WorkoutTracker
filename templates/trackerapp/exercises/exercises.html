@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Exercises{% endblock %}
+
+{% block content %}
+    <h2>All Exercises</h2>
+
+    <a href="{% url 'add_exercise' %}" class="btn">➕ Add New Exercise</a>
+
+    <table id="exerciseTable" class="display">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for exercise in exercises %}
+                <tr>
+                    <td>{{ exercise.name }}</td>
+                    <td>{{ exercise.get_category_display }}</td>
+                    <td>
+                        <form action="{% url 'update_exercise' exercise.id %}" method="get" style="display: inline;">
+                            <button type="submit" class="btn update">✏️ Update</button>
+                        </form>
+                        <button type="button" onclick="confirmDelete({{ exercise.id }})" class="btn delete">🗑️ Delete</button>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <form id="delete-form" method="post" style="display: none;"></form>
+
+    <!-- Include DataTables CSS & JS from CDN -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            $('#exerciseTable').DataTable();
+        });
+
+        function getCSRFToken() {
+        const name = 'csrftoken';
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            let cookie = cookies[i].trim();
+            if (cookie.startsWith(name + '=')) {
+                return decodeURIComponent(cookie.substring(name.length + 1));
+            }
+        }
+        return null;
+    }
+
+    function confirmDelete(exerciseId) {
+        alert("Deleting exercise: " + exerciseId);  // debug check
+        if (confirm("Are you sure you want to permanently delete this exercise?")) {
+            const form = document.getElementById('delete-form');
+            form.action = `/exercises/${exerciseId}/delete/`;
+            form.innerHTML = '';  // clear any old CSRF token
+
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = 'csrfmiddlewaretoken';
+            csrfInput.value = getCSRFToken();
+            form.appendChild(csrfInput);
+
+            form.submit();
+        }
+    }
+    </script>
+{% endblock %}
