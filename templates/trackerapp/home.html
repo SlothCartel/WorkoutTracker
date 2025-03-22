@@ -43,7 +43,8 @@
 
 <script>
     // Simple inline alert to verify JavaScript is running at all
-    alert("JavaScript is running");
+    // Check if Chart.js loaded
+    alert("Chart.js loaded: " + (typeof Chart !== 'undefined'));
     
     document.addEventListener('DOMContentLoaded', function() {
         alert("DOM is loaded");
