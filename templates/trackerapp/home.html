@@ -15,7 +15,7 @@
                 <div class="col-md-8">
                     <!-- Bar Graph Container -->
                     <div class="chart-container" style="position: relative; height:250px;border: 1px solid #eee;">
-                        <div><canvas id="topExercisesChart"></canvas></div>
+                        <canvas id="chart" width="500" height="500"></canvas>
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -41,28 +41,29 @@
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.2.1/dist/chart.umd.min.js"></script>
 
-<script>
-    // Simple inline alert to verify JavaScript is running at all
-    // Check if Chart.js loaded
-    alert("Chart.js loaded: " + (typeof Chart !== 'undefined'));
-    
-    document.addEventListener('DOMContentLoaded', function() {
-        alert("DOM is loaded");
-        
-        // Get the canvas element and create an ultra-simple chart
-        const ctx = document.getElementById('topExercisesChart');
-        
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ["Exercise 1", "Exercise 2", "Exercise 3"],
-                datasets: [{
-                    label: 'Times Performed',
-                    data: [5, 3, 2],
-                    backgroundColor: ['blue', 'green', 'orange']
-                }]
-            }
-        });
-    });
+let ctx = document.getElementById("chart").getContext("2d");
+
+let chart = new Chart(ctx, {
+  type: "bar",
+  data: {
+     labels: ["2020/Q1", "2020/Q2", "2020/Q3", "2020/Q4"],
+     datasets: [
+        {
+          label: "Gross volume ($)",
+          backgroundColor: "#79AEC8",
+          borderColor: "#417690",
+          data: [26900, 28700, 27300, 29200]
+        }
+     ]
+  },
+  options: {
+     title: {
+        text: "Gross Volume in 2020",
+        display: true
+     }
+  }
+});
+
+
 </script>
 {% endblock %}
