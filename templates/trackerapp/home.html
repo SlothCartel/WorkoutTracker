@@ -39,72 +39,29 @@
 {% endblock %}
 
 {% block extra_js %}
-<!-- Include Chart.js library -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-    console.log("ALWAYS VISIBLE: Script block is executing");
-    console.log("Chart.js loaded:", typeof Chart !== 'undefined');
-
-    // Only execute if we have top exercises data
-    {% if top_exercises %}
-    console.log("top_exercises exists in template:", JSON.stringify({{ top_exercises|safe }}));
+    // Simple inline alert to verify JavaScript is running at all
+    alert("JavaScript is running");
     
     document.addEventListener('DOMContentLoaded', function() {
-        console.log("DOM loaded");
+        alert("DOM is loaded");
         
-        // Get the canvas element
-        const ctx = document.getElementById('topExercisesChart').getContext('2d');
+        // Get the canvas element and create an ultra-simple chart
+        const ctx = document.getElementById('topExercisesChart');
         
-        // Prepare data for the chart
-        const labels = [];
-        const counts = [];
-        {% for exercise in top_exercises %}
-            labels.push("{{ exercise.name }}");
-            counts.push({{ exercise.count }});
-        {% endfor %}
-        
-        console.log("Data before chart creation:", labels, counts);
-
-        // Create the bar chart
-        const topExercisesChart = new Chart(ctx, {
+        new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: labels,
+                labels: ["Exercise 1", "Exercise 2", "Exercise 3"],
                 datasets: [{
                     label: 'Times Performed',
-                    data: counts,
-                    backgroundColor: [
-                        'rgba(54, 162, 235, 0.7)',
-                        'rgba(75, 192, 192, 0.7)',
-                        'rgba(255, 159, 64, 0.7)'
-                    ],
-                    borderColor: [
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(255, 159, 64, 1)'
-                    ],
-                    borderWidth: 1
+                    data: [5, 3, 2],
+                    backgroundColor: ['blue', 'green', 'orange']
                 }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            precision: 0
-                        }
-                    }
-                }
             }
         });
-        
-        console.log("Chart created");
     });
-    {% else %}
-    console.log("No top_exercises data available");
-    {% endif %}
 </script>
 {% endblock %}
