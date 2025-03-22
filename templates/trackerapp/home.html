@@ -5,4 +5,98 @@
     <h2>Welcome to Your Weightlifting Tracker 🏋️</h2>
     <p>Track your workouts, monitor progress, and stay consistent.</p>
     <p><a href="/workouts/">View Workouts</a> | <a href="/exercises/">View Exercises</a></p>
+
+    <!-- Top 3 Most Frequent Exercises Section -->
+    <div class="top-exercises-section mt-5">
+        <h3>Your Top 3 Most Frequent Exercises 🏆</h3>
+        
+        {% if top_exercises %}
+            <div class="row">
+                <div class="col-md-8">
+                    <!-- Bar Graph Container -->
+                    <div class="chart-container" style="position: relative; height:250px;">
+                        <canvas id="topExercisesChart"></canvas>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <!-- Exercise List -->
+                    <div class="list-group">
+                        {% for exercise in top_exercises %}
+                            <div class="list-group-item">
+                                <h5>{{ forloop.counter }}. {{ exercise.name }}</h5>
+                                <p>Performed {{ exercise.count }} times</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                <p>You haven't logged any workouts yet. Start tracking to see your most frequent exercises!</p>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Include Chart.js library -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    // Only execute if we have top exercises data
+    {% if top_exercises %}
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get the canvas element
+        const ctx = document.getElementById('topExercisesChart').getContext('2d');
+        
+        // Prepare data for the chart
+        const labels = [
+            {% for exercise in top_exercises %}
+                "{{ exercise.name }}",
+            {% endfor %}
+        ];
+        
+        const counts = [
+            {% for exercise in top_exercises %}
+                {{ exercise.count }},
+            {% endfor %}
+        ];
+        
+        // Create the bar chart
+        const topExercisesChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Times Performed',
+                    data: counts,
+                    backgroundColor: [
+                        'rgba(54, 162, 235, 0.7)',
+                        'rgba(75, 192, 192, 0.7)',
+                        'rgba(255, 159, 64, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                }
+            }
+        });
+    });
+    {% endif %}
+</script>
 {% endblock %}
