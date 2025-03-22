@@ -57,6 +57,8 @@
             counts.push({{ exercise.count }});
         {% endfor %}
         
+        console.log("Data before chart creation:", labels, counts);
+
         // Create the bar chart
         const topExercisesChart = new Chart(ctx, {
             type: 'bar',
