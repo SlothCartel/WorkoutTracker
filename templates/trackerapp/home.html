@@ -50,17 +50,12 @@
         const ctx = document.getElementById('topExercisesChart').getContext('2d');
         
         // Prepare data for the chart
-        const labels = [
-            {% for exercise in top_exercises %}
-                "{{ exercise.name }}",
-            {% endfor %}
-        ];
-        
-        const counts = [
-            {% for exercise in top_exercises %}
-                {{ exercise.count }},
-            {% endfor %}
-        ];
+        const labels = [];
+        const counts = [];
+        {% for exercise in top_exercises %}
+            labels.push("{{ exercise.name }}");
+            counts.push({{ exercise.count }});
+        {% endfor %}
         
         // Create the bar chart
         const topExercisesChart = new Chart(ctx, {
