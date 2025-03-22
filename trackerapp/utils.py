@@ -1,4 +1,5 @@
 from .models import *
+from django.db.models import Count
 
 class ExerciseOperations:
 
@@ -138,4 +139,24 @@ class WorkoutOperations:
     def delete_workout(workout_id: int):
         workout = Workout.objects.get(id=workout_id)
         workout.delete()
+
+class HomeOperations:
+
+    @staticmethod
+    def get_top_exercises(limit=3):
+        #Returns the top most frequently performed exercises
+        #based on how many workout records they appear in
         
+        exercise_counts = WorkoutExercise.objects.values('exercise__id', 'exercise__name') \
+            .annotate(count=Count('exercise')) \
+            .order_by('-count')[:limit]
+
+        top_exercises = [
+        {
+            'name': item['exercise__name'],
+            'count': item['count']
+        }
+        for item in exercise_counts
+        ]
+        
+        return top_exercises

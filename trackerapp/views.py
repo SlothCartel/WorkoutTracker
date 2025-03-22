@@ -8,7 +8,9 @@ from django.core.serializers.json import DjangoJSONEncoder
 # Create your views here.
 
 def home(request):
-    return render(request, 'trackerapp/home.html')
+    top_exercises = HomeOperations.get_top_exercises()
+
+    return render(request, 'trackerapp/home.html', {'top_exercises': top_exercises})
 
 def exercises(request):
     exercises = Exercise.objects.all().order_by('name')
