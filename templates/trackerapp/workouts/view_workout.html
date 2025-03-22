@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block title %}View Workout{% endblock %}
+
+{% block content %}
+    <h2>Workout on {{ workout.date }}</h2>
+    {% if workout.notes %}
+        <p><strong>Notes:</strong> {{ workout.notes }}</p>
+    {% endif %}
+
+    {% if workout.exercises.all %}
+        <h3>Exercises</h3>
+        {% for we in workout.exercises.all %}
+            <div style="margin-bottom: 20px;">
+                <h4>{{ we.exercise.name }} ({{ we.exercise.get_category_display }})</h4>
+
+                {% if we.exercise.category == 'WEIGHT' %}
+                    {% if we.sets.all %}
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Set</th>
+                                    <th>Reps</th>
+                                    <th>Weight (kg)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for s in we.sets.all %}
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ s.reps }}</td>
+                                        <td>{{ s.weight }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <p>No sets logged.</p>
+                    {% endif %}
+                {% elif we.exercise.category == 'CARDIO' %}
+                    {% if we.cardio_log %}
+                        <ul>
+                            <li><strong>Duration:</strong> {{ we.cardio_log.duration_minutes }} min</li>
+                            {% if we.cardio_log.distance_km %}
+                                <li><strong>Distance:</strong> {{ we.cardio_log.distance_km }} km</li>
+                            {% endif %}
+                            {% if we.cardio_log.calories_burned %}
+                                <li><strong>Calories:</strong> {{ we.cardio_log.calories_burned }}</li>
+                            {% endif %}
+                        </ul>
+                    {% else %}
+                        <p>No cardio data logged.</p>
+                    {% endif %}
+                {% endif %}
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No exercises in this workout.</p>
+    {% endif %}
+
+    <a href="{% url 'workouts' %}" class="btn">← Back to Workouts</a>
+{% endblock %}
