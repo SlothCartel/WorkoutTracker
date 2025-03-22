@@ -9,7 +9,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 
 def home(request):
     top_exercises = HomeOperations.get_top_exercises()
-
+    print(f"DEBUG - top_exercises data being sent to template: {top_exercises}")
     return render(request, 'trackerapp/home.html', {'top_exercises': top_exercises})
 
 def exercises(request):
