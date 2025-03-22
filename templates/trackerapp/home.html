@@ -6,6 +6,26 @@
     <p>Track your workouts, monitor progress, and stay consistent.</p>
     <p><a href="/workouts/">View Workouts</a> | <a href="/exercises/">View Exercises</a></p>
 
+    <!-- Weekly Volume Trends Section -->
+    <div class="weekly-volume-section mt-5">
+        <h3>Workout Volume Trend (per week) 📈</h3>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <h5>Weight Training Volume</h5>
+                <div class="chart-container" style="position: relative; height:250px;border: 1px solid #eee;">
+                    <canvas id="weightVolumeChart"></canvas>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <h5>Cardio Training Volume</h5>
+                <div class="chart-container" style="position: relative; height:250px;border: 1px solid #eee;">
+                    <canvas id="cardioVolumeChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Top 3 Most Frequent Exercises Section -->
     <div class="top-exercises-section mt-5">
         <h3>Your Top 3 Most Frequent Exercises 🏆</h3>
@@ -36,6 +56,78 @@
         // Basic test to confirm JavaScript is running
         console.log('DOM loaded');
         
+        // VOLUME CHARTS
+        // Weight volume chart
+        const weightCanvas = document.getElementById('weightVolumeChart');
+        if (weightCanvas) {
+            const weightLabels = JSON.parse('{{ weight_volume_labels|safe }}');
+            const weightData = JSON.parse('{{ weight_volume_data|safe }}');
+            
+            if (weightLabels.length > 0) {
+                new Chart(weightCanvas, {
+                    type: 'line',
+                    data: {
+                        labels: weightLabels,
+                        datasets: [{
+                            label: 'Weekly Volume (weight × reps)',
+                            data: weightData,
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 2,
+                            tension: 0.1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            } else {
+                weightCanvas.parentNode.innerHTML = '<div class="alert alert-info mt-3">No weight training data available yet.</div>';
+            }
+        }
+        
+        // Cardio volume chart
+        const cardioCanvas = document.getElementById('cardioVolumeChart');
+        if (cardioCanvas) {
+            const cardioLabels = JSON.parse('{{ cardio_volume_labels|safe }}');
+            const cardioData = JSON.parse('{{ cardio_volume_data|safe }}');
+            
+            if (cardioLabels.length > 0) {
+                new Chart(cardioCanvas, {
+                    type: 'line',
+                    data: {
+                        labels: cardioLabels,
+                        datasets: [{
+                            label: 'Weekly Volume (composite metric)',
+                            data: cardioData,
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 2,
+                            tension: 0.1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            } else {
+                cardioCanvas.parentNode.innerHTML = '<div class="alert alert-info mt-3">No cardio training data available yet.</div>';
+            }
+        }
+        
+        // TOP EXERCISES CHART
         // Get canvas element
         const canvas = document.getElementById('topExercisesChart');
         

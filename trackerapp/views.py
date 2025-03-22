@@ -9,8 +9,20 @@ from django.core.serializers.json import DjangoJSONEncoder
 
 def home(request):
     top_exercises = HomeOperations.get_top_exercises()
-    print(f"DEBUG - top_exercises data being sent to template: {top_exercises}")
-    return render(request, 'trackerapp/home.html', {'top_exercises': top_exercises})
+    
+    # Get weekly volume data
+    weight_volume = HomeOperations.get_weekly_weight_volume()
+    cardio_volume = HomeOperations.get_weekly_cardio_volume()
+
+    context = {
+        'top_exercises': top_exercises,
+        'weight_volume_labels': json.dumps(weight_volume['labels']),
+        'weight_volume_data': json.dumps(weight_volume['data']),
+        'cardio_volume_labels': json.dumps(cardio_volume['labels']),
+        'cardio_volume_data': json.dumps(cardio_volume['data'])
+    }
+
+    return render(request, 'trackerapp/home.html', context)
 
 def exercises(request):
     exercises = Exercise.objects.all().order_by('name')

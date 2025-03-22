@@ -1,5 +1,9 @@
 from .models import *
 from django.db.models import Count
+from django.db.models import Sum, F, FloatField
+from django.db.models.functions import TruncWeek
+from datetime import datetime, timedelta
+from datetime import datetime, timedelta
 
 class ExerciseOperations:
 
@@ -160,3 +164,80 @@ class HomeOperations:
         ]
         
         return top_exercises
+
+    @staticmethod
+    def get_weekly_weight_volume(weeks=10):
+        #Calculate weekly weight training volume (weight * reps)
+
+        start_date = datetime.now().date() - timedelta(weeks=weeks)
+
+        weekly_data = {}
+
+        workouts = Workout.objects.filter(date__gte=start_date).order_by('date')
+
+        for workout in workouts:
+            week_key = workout.date.strftime('%b %d')
+            
+            if week_key not in weekly_data:
+                weekly_data[week_key] = 0
+            
+            weight_exercises = WorkoutExercise.objects.filter(
+                workout=workout,
+                exercise__category='WEIGHT'
+            )
+
+        for we in weight_exercises:
+                sets = Set.objects.filter(workout_exercise=we)
+                for s in sets:
+                    weekly_data[week_key] += float(s.weight) * s.reps
+
+        sorted_weeks = sorted(weekly_data.keys(), key=lambda x: datetime.strptime(x, '%b %d'))
+
+        return {
+            'labels': sorted_weeks,
+            'data': [weekly_data[week] for week in sorted_weeks]
+        }
+    
+    @staticmethod
+    def get_weekly_cardio_volume(weeks=10):
+        #Calculate weekly cardio volume
+
+        start_date = datetime.now().date() - timedelta(weeks=weeks)
+
+        weekly_data = {}
+
+        workouts = Workout.objects.filter(date__gte=start_date).order_by('date')
+
+        for workout in workouts:
+            week_key = workout.date.strftime('%b %d')
+            
+            if week_key not in weekly_data:
+                weekly_data[week_key] = 0
+            
+            cardio_exercises = WorkoutExercise.objects.filter(
+                workout=workout,
+                exercise__category='CARDIO' 
+        )
+
+        for we in cardio_exercises:
+            try:
+                cardio = CardioLog.objects.get(workout_exercise=we)
+                
+                volume = cardio.duration_minutes
+                
+                if cardio.distance_km:
+                    volume += float(cardio.distance_km) * 5
+                
+                if cardio.calories_burned:
+                    volume += cardio.calories_burned / 10
+                
+                weekly_data[week_key] += volume
+            except CardioLog.DoesNotExist:
+                pass  
+
+        sorted_weeks = sorted(weekly_data.keys(), key=lambda x: datetime.strptime(x, '%b %d'))
+
+        return {
+            'labels': sorted_weeks,
+            'data': [weekly_data[week] for week in sorted_weeks]
+        }
