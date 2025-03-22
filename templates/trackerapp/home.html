@@ -43,8 +43,13 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
+    console.log("ALWAYS VISIBLE: Script block is executing");
+    console.log("Chart.js loaded:", typeof Chart !== 'undefined');
+
+
     // Only execute if we have top exercises data
     {% if top_exercises %}
+    console.log("top_exercises exists in template");
     document.addEventListener('DOMContentLoaded', function() {
         // Get the canvas element
         const ctx = document.getElementById('topExercisesChart').getContext('2d');
@@ -95,6 +100,8 @@
         });
         console.log("Top exercises data:", labels, counts);
     });
+    {% else %}
+    console.log("top_exercises is EMPTY or NOT DEFINED in template");
     {% endif %}
 </script>
 {% endblock %}
