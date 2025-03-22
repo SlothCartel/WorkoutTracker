@@ -1,8 +1,6 @@
 {% extends 'base.html' %}
 {% block title %}Home - Weight Tracker{% endblock %}
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.2.1/dist/chart.umd.min.js"></script>
-
 {% block content %}
     <h2>Welcome to Your Weightlifting Tracker 🏋️</h2>
     <p>Track your workouts, monitor progress, and stay consistent.</p>
@@ -17,7 +15,7 @@
                 <div class="col-md-8">
                     <!-- Bar Graph Container -->
                     <div class="chart-container" style="position: relative; height:250px;border: 1px solid #eee;">
-                        <canvas id="chart" width="500" height="500"></canvas>
+                        <canvas id="topExercisesChart"></canvas>
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -39,32 +37,65 @@
         {% endif %}
     </div>
 {% endblock %}
-
 {% block extra_js %}
+<!-- Load Chart.js from CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-let ctx = document.getElementById("chart").getContext("2d");
-
-let chart = new Chart(ctx, {
-  type: "bar",
-  data: {
-     labels: ["2020/Q1", "2020/Q2", "2020/Q3", "2020/Q4"],
-     datasets: [
-        {
-          label: "Gross volume ($)",
-          backgroundColor: "#79AEC8",
-          borderColor: "#417690",
-          data: [26900, 28700, 27300, 29200]
+<script>
+    // Wait for DOM to be ready
+    document.addEventListener('DOMContentLoaded', function() {
+        // Basic test to confirm JavaScript is running
+        console.log('DOM loaded');
+        
+        // Get canvas element
+        const canvas = document.getElementById('topExercisesChart');
+        
+        // Check if canvas exists
+        if (!canvas) {
+            console.error('Canvas element not found!');
+            return;
         }
-     ]
-  },
-  options: {
-     title: {
-        text: "Gross Volume in 2020",
-        display: true
-     }
-  }
-});
-
-
+        
+        // Prepare data arrays
+        const labels = [];
+        const data = [];
+        
+        // Populate arrays from Django template data
+        {% for exercise in top_exercises %}
+            labels.push("{{ exercise.name }}");
+            data.push({{ exercise.count }});
+        {% endfor %}
+        
+        // Create chart
+        new Chart(canvas, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Times Performed',
+                    data: data,
+                    backgroundColor: [
+                        'rgba(54, 162, 235, 0.7)',
+                        'rgba(75, 192, 192, 0.7)',
+                        'rgba(255, 159, 64, 0.7)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                }
+            }
+        });
+    });
 </script>
 {% endblock %}
+
