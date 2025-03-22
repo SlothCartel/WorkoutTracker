@@ -46,11 +46,13 @@
     console.log("ALWAYS VISIBLE: Script block is executing");
     console.log("Chart.js loaded:", typeof Chart !== 'undefined');
 
-
     // Only execute if we have top exercises data
     {% if top_exercises %}
-    console.log("top_exercises exists in template");
+    console.log("top_exercises exists in template:", JSON.stringify({{ top_exercises|safe }}));
+    
     document.addEventListener('DOMContentLoaded', function() {
+        console.log("DOM loaded");
+        
         // Get the canvas element
         const ctx = document.getElementById('topExercisesChart').getContext('2d');
         
@@ -98,10 +100,11 @@
                 }
             }
         });
-        console.log("Top exercises data:", labels, counts);
+        
+        console.log("Chart created");
     });
     {% else %}
-    console.log("top_exercises is EMPTY or NOT DEFINED in template");
+    console.log("No top_exercises data available");
     {% endif %}
 </script>
 {% endblock %}
