@@ -63,6 +63,19 @@ def delete_exercise(request, exercise_id):
 
     return redirect('exercises')
 
+def metrics_exercise(request, exercise_id):
+    try:
+        exercise = ExerciseOperations.get_exercise_by_id(exercise_id)
+        metrics_data = ExerciseOperations.get_exercise_metrics(exercise_id)
+        
+        context = {
+            'exercise': exercise,
+            'metrics_data': json.dumps(metrics_data, cls=DjangoJSONEncoder)
+        }
+        return render(request, 'trackerapp/exercises/metrics_exercises.html', context)
+    except Exercise.DoesNotExist:
+        return redirect('exercises')
+
 def workouts(request):
     workouts = Workout.objects.all().order_by('date')
 

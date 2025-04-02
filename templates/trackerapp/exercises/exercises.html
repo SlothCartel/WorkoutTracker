@@ -25,6 +25,9 @@
                         <form action="{% url 'update_exercise' exercise.id %}" method="get" style="display: inline;">
                             <button type="submit" class="btn update">✏️ Update</button>
                         </form>
+                        <form action="{% url 'metrics_exercise' exercise.id %}" method="get" style="display: inline;">
+                            <button type="submit" class="btn update"> Metrics </button>
+                        </form>
                         <button type="button" onclick="confirmDelete({{ exercise.id }})" class="btn delete">🗑️ Delete</button>
                     </td>
                 </tr>

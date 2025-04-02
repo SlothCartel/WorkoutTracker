@@ -35,6 +35,74 @@ class ExerciseOperations:
         exercise = Exercise.objects.get(id=exercise_id)
         exercise.delete()
 
+    @staticmethod
+    def get_exercise_metrics(exercise_id: int):
+        exercise = Exercise.objects.get(id=exercise_id)
+        workout_exercises = WorkoutExercise.objects.filter(exercise=exercise).order_by('workout__date')
+        
+        if exercise.category == 'WEIGHT':
+            # Get sets per workout
+            sets_data = {}
+            avg_weight_data = {}
+            
+            for we in workout_exercises:
+                date_key = we.workout.date.strftime('%Y-%m-%d')
+                sets = Set.objects.filter(workout_exercise=we)
+                total_sets = sets.count()
+                
+                if total_sets > 0:
+                    total_weight = sum(float(s.weight) for s in sets)
+                    avg_weight = total_weight / total_sets
+                    sets_data[date_key] = total_sets
+                    avg_weight_data[date_key] = round(avg_weight, 2)
+            
+            # Calculate weight recommendation
+            sorted_dates = sorted(avg_weight_data.keys())
+            weight_recommendation = 0
+            
+            if len(sorted_dates) >= 2 and len(sorted_dates) % 2 == 0:
+                last_two_weights = [avg_weight_data[sorted_dates[-1]], avg_weight_data[sorted_dates[-2]]]
+                avg_last_two = sum(last_two_weights) / 2
+                weight_recommendation = round(avg_last_two * 1.1, 2)
+            
+            return {
+                'sets_data': {
+                    'labels': list(sets_data.keys()),
+                    'data': list(sets_data.values())
+                },
+                'weight_data': {
+                    'labels': list(avg_weight_data.keys()),
+                    'data': list(avg_weight_data.values())
+                },
+                'weight_recommendation': weight_recommendation
+            }
+        
+        else:  # CARDIO
+            calories_data = {}
+            distance_data = {}
+            
+            for we in workout_exercises:
+                date_key = we.workout.date.strftime('%Y-%m-%d')
+                try:
+                    cardio_log = we.cardio_log
+                    if cardio_log.calories_burned:
+                        calories_data[date_key] = cardio_log.calories_burned
+                    if cardio_log.distance_km:
+                        distance_data[date_key] = float(cardio_log.distance_km)
+                except CardioLog.DoesNotExist:
+                    continue
+            
+            return {
+                'calories_data': {
+                    'labels': list(calories_data.keys()),
+                    'data': list(calories_data.values())
+                },
+                'distance_data': {
+                    'labels': list(distance_data.keys()),
+                    'data': list(distance_data.values())
+                }
+            }
+
 class WorkoutOperations:
 
     @staticmethod
@@ -186,7 +254,7 @@ class HomeOperations:
                 exercise__category='WEIGHT'
             )
 
-        for we in weight_exercises:
+            for we in weight_exercises:  # Indented to be inside the workout loop
                 sets = Set.objects.filter(workout_exercise=we)
                 for s in sets:
                     weekly_data[week_key] += float(s.weight) * s.reps
@@ -217,23 +285,23 @@ class HomeOperations:
             cardio_exercises = WorkoutExercise.objects.filter(
                 workout=workout,
                 exercise__category='CARDIO' 
-        )
+            )
 
-        for we in cardio_exercises:
-            try:
-                cardio = CardioLog.objects.get(workout_exercise=we)
-                
-                volume = cardio.duration_minutes
-                
-                if cardio.distance_km:
-                    volume += float(cardio.distance_km) * 5
-                
-                if cardio.calories_burned:
-                    volume += cardio.calories_burned / 10
-                
-                weekly_data[week_key] += volume
-            except CardioLog.DoesNotExist:
-                pass  
+            for we in cardio_exercises:  # Indented to be inside the workout loop
+                try:
+                    cardio = CardioLog.objects.get(workout_exercise=we)
+                    
+                    volume = cardio.duration_minutes
+                    
+                    if cardio.distance_km:
+                        volume += float(cardio.distance_km) * 5
+                    
+                    if cardio.calories_burned:
+                        volume += cardio.calories_burned / 10
+                    
+                    weekly_data[week_key] += volume
+                except CardioLog.DoesNotExist:
+                    pass
 
         sorted_weeks = sorted(weekly_data.keys(), key=lambda x: datetime.strptime(x, '%b %d'))
 

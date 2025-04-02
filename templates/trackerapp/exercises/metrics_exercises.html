@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ exercise.name }} Metrics{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Metrics for {{ exercise.name }}</h1>
+    
+    {% if exercise.category == 'WEIGHT' %}
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Sets Per Workout</h5>
+                        <canvas id="setsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Average Weight Per Workout</h5>
+                        <canvas id="weightChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Weight Recommendation</h5>
+                        <p id="weightRecommendation"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Calories Burned Per Workout</h5>
+                        <canvas id="caloriesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Distance Covered Per Workout</h5>
+                        <canvas id="distanceChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const metricsData = JSON.parse('{{ metrics_data|safe }}');
+    
+    {% if exercise.category == 'WEIGHT' %}
+        // Sets Chart
+        new Chart(document.getElementById('setsChart'), {
+            type: 'line',
+            data: {
+                labels: metricsData.sets_data.labels,
+                datasets: [{
+                    label: 'Sets',
+                    data: metricsData.sets_data.data,
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1
+                }]
+            }
+        });
+        
+        // Weight Chart
+        new Chart(document.getElementById('weightChart'), {
+            type: 'line',
+            data: {
+                labels: metricsData.weight_data.labels,
+                datasets: [{
+                    label: 'Average Weight (kg)',
+                    data: metricsData.weight_data.data,
+                    borderColor: 'rgb(255, 99, 132)',
+                    tension: 0.1
+                }]
+            }
+        });
+        
+        // Weight Recommendation
+        const recElement = document.getElementById('weightRecommendation');
+        if (metricsData.weight_recommendation > 0) {
+            recElement.textContent = `Recommended weight for next workout: ${metricsData.weight_recommendation}kg`;
+        } else {
+            recElement.textContent = 'Complete another workout with this exercise for a weight recommendation.';
+        }
+    {% else %}
+        // Calories Chart
+        new Chart(document.getElementById('caloriesChart'), {
+            type: 'line',
+            data: {
+                labels: metricsData.calories_data.labels,
+                datasets: [{
+                    label: 'Calories Burned',
+                    data: metricsData.calories_data.data,
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1
+                }]
+            }
+        });
+        
+        // Distance Chart
+        new Chart(document.getElementById('distanceChart'), {
+            type: 'line',
+            data: {
+                labels: metricsData.distance_data.labels,
+                datasets: [{
+                    label: 'Distance (km)',
+                    data: metricsData.distance_data.data,
+                    borderColor: 'rgb(255, 99, 132)',
+                    tension: 0.1
+                }]
+            }
+        });
+    {% endif %}
+</script>
+{% endblock %}
