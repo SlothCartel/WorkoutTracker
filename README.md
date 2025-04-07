@@ -77,4 +77,8 @@ We welcome contributions to improve WorkoutTracker. Please follow these steps to
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the GNU GENERAL PUBLIC LICENSE. See the [LICENSE](LICENSE) file for details.
+
+## Contact Details
+
+For any inquiries, you can contact me at business.eugeneholt@gmail.com
